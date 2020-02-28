@@ -1,0 +1,24 @@
+{
+  "name": "ws-server-controller-view",
+  "version": "1.0.0",
+  "description": "Simple WebSocket server for Controller and View communication",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janvlasaty/ws-server-controller-view.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/janvlasaty/ws-server-controller-view/issues"
+  },
+  "homepage": "https://github.com/janvlasaty/ws-server-controller-view#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "websocket": "^1.0.31"
+  }
+}

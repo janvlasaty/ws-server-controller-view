@@ -1,0 +1,91 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>WS client view</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <!-- <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
+
+</head>
+
+<body>
+<h1>View</h1>
+
+<div id="rectangle" style="width:400px;height:400px;background-color: blue;"></div>
+
+<script>
+
+
+
+// if user is running mozilla then use it's built-in WebSocket
+window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+var server = 'localhost:8080';
+var connection = {}
+function connect() {
+
+    connection = new WebSocket('ws://'+server+'?type=canvas');
+
+    connection.onopen = function () {
+        // connection is opened and ready to use
+        console.log('Connected as canvas!');
+    };
+
+    connection.onclose = function(e) {
+        console.log('Socket is closed. Reconnect will be attempted in 30 seconds.', e.reason);
+        setTimeout(function() {
+          connect();
+        }, 30000);
+      };
+
+    connection.onerror = function (error) {
+        // an error occurred when sending/receiving data
+        console.log('error!!');
+    };
+
+    connection.onmessage = function (message) {
+        // try to decode json (I assume that each message
+        // from server is json)
+        try {
+            var json = JSON.parse(message.data);
+            react(json);
+        } catch (e) {
+            console.error('Error ',e);
+            return;
+        }
+        // handle incoming message
+    };
+}
+connect();
+
+
+function react(message) {
+    switch (message.metadata.type) {
+
+        case 'info':
+            console.log('info >>>');
+            console.log(message.data);
+            break;
+            
+
+        case 'changeRectangle':
+            console.log('changeRectangle >>>');
+            document.querySelector('#rectangle').style['background-color']= message.data;
+            break;
+
+        default:
+            console.log(message);
+            break;
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>

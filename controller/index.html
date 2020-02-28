@@ -1,0 +1,84 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>WS client controller</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+  <!-- <link rel="stylesheet" href="css/styles.css?v=1.0"> -->
+
+</head>
+
+<body>
+
+    <button id="action" onclick="sendMessage({'metadata':{'type':'broadcastViews'},'data':{'metadata':{'type':'info'},'data':'Sending only info data'}})">Send info data</button>
+    <button id="action" onclick="sendMessage({'metadata':{'type':'broadcastViews'},'data':{'metadata':{'type':'changeRectangle'},'data':'#ff0000'}})">Change rectangle to red</button>
+
+<script>
+// if user is running mozilla then use it's built-in WebSocket
+window.WebSocket = window.WebSocket || window.MozWebSocket;
+
+var server = 'localhost:8080';
+var connection = {}
+
+var url = new URL(window.location.href);
+var key = url.searchParams.get("key");
+
+function connect() {
+    connection = new WebSocket('ws://'+server+'?type=controller&key='+key);
+
+    connection.onopen = function () {
+        // connection is opened and ready to use
+        console.log('Connected as controller!');
+    };
+
+
+    connection.onclose = function(e) {
+        console.log('Socket is closed. Reconnect will be attempted in 10 seconds.', e.reason);
+        setTimeout(function() {
+        connect();
+        }, 10000);
+    };
+
+    connection.onerror = function (error) {
+        // an error occurred when sending/receiving data
+        console.log('error!!');
+    };
+
+    connection.onmessage = function (message) {
+        // try to decode json (I assume that each message
+        // from server is json)
+        try {
+            var json = JSON.parse(message.data);
+            react(json)
+        } catch (e) {
+            console.error('Error ',e);
+            return;
+        }
+        // handle incoming message
+    };
+}
+connect();
+
+function react(message) {
+    switch (message.metadata.type) {           
+        case 'info': 
+            console.log(message);
+            break;
+        default:
+            break;
+    }
+}
+
+function sendMessage(message) {
+    console.log(message)
+    connection.send(JSON.stringify(message))
+}
+
+</script>
+
+</body>
+</html>
